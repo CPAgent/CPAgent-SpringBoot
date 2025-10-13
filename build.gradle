@@ -38,6 +38,8 @@ dependencies {
 
 	// In-memory database for simple authentication DB
 	runtimeOnly 'com.h2database:h2'
+	// PostgreSQL JDBC driver
+	runtimeOnly 'org.postgresql:postgresql:42.6.0'
 	// JWT support (JJWT)
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
