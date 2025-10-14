@@ -17,11 +17,11 @@ public class User {
     private UUID id;
 
     @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
     private String password;
-
-    // comma separated roles, e.g., ROLE_USER,ROLE_ADMIN
-    private String roles;
 }

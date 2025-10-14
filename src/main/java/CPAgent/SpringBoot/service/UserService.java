@@ -17,17 +17,17 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User register(String username, String rawPassword) {
+    public User register(String email, String username, String rawPassword) {
         String hashed = passwordEncoder.encode(rawPassword);
         User user = new User();
+        user.setEmail(email);
         user.setUsername(username);
         user.setPassword(hashed);
-        user.setRoles("ROLE_USER");
         return userRepository.save(user);
     }
 
-    public Optional<User> authenticate(String username, String rawPassword) {
-        Optional<User> u = userRepository.findByUsername(username);
+    public Optional<User> authenticate(String email, String rawPassword) {
+        Optional<User> u = userRepository.findByEmail(email);
         if (u.isPresent()) {
             if (passwordEncoder.matches(rawPassword, u.get().getPassword())) {
                 return u;

@@ -23,15 +23,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        User u = userService.register(req.getUsername(), req.getPassword());
+        User u = userService.register(req.getEmail(), req.getUsername(), req.getPassword());
         return ResponseEntity.ok(Map.of("id", u.getId(), "username", u.getUsername()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        return userService.authenticate(req.getUsername(), req.getPassword())
+        return userService.authenticate(req.getEmail(), req.getPassword())
                 .map(u -> {
-                    String token = jwtUtil.generateToken(u.getUsername());
+                    String token = jwtUtil.generateToken(u.getEmail());
                     return ResponseEntity.ok(Map.of("token", token));
                 })
                 .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "invalid credentials")));
@@ -39,13 +39,14 @@ public class AuthController {
 
     @Data
     public static class RegisterRequest {
+        private String email;
         private String username;
         private String password;
     }
 
     @Data
     public static class LoginRequest {
-        private String username;
+        private String email;
         private String password;
     }
 }

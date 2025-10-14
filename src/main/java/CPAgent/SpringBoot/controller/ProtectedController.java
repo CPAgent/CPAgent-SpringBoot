@@ -14,6 +14,6 @@ public class ProtectedController {
     @GetMapping("/protected")
     public Map<String, Object> protectedEndpoint(Authentication authentication) {
         String principal = (authentication != null) ? authentication.getName() : "anonymous";
-        return Map.of("message", "This is a protected resource", "user", principal);
+        return Map.of("message", "This is a protected resource", "user-email", principal);
     }
 }
