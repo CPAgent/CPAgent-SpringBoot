@@ -24,13 +24,16 @@ public class JwtUtil {
     private final PrivateKey rsaPrivateKey; // for RS256 signing
     private final PublicKey rsaPublicKey; // for RS256 verification
     private final long validityMillis;
+    private final long refreshValidityMillis;
 
     public JwtUtil(
             @Value("${jwt.secret:}") String secret,
             @Value("${jwt.private-key-file:}") String privateKeyFileOrPem,
             @Value("${jwt.public-key-file:}") String publicKeyFileOrPem,
-            @Value("${jwt.expiration-ms:3600000}") long validityMillis) throws Exception {
+            @Value("${jwt.expiration-ms:3600000}") long validityMillis,
+            @Value("${jwt.refresh-expiration-ms:1209600000}") long refreshValidityMillis) throws Exception {
         this.validityMillis = validityMillis;
+        this.refreshValidityMillis = refreshValidityMillis;
 
         // Try load RSA keys if provided (either direct PEM text or a file path)
         PrivateKey pKey = null;
@@ -61,6 +64,7 @@ public class JwtUtil {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(now)
+                .claim("token_type", "access")
                 .setExpiration(exp);
 
         if (rsaPrivateKey != null) {
@@ -70,6 +74,28 @@ public class JwtUtil {
             return builder.signWith(hmacKey, SignatureAlgorithm.HS256).compact();
         }
         throw new IllegalStateException("No signing key configured for JWT. Provide rsa private key or jwt.secret.");
+    }
+
+    public String generateRefreshToken(String email) {
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + refreshValidityMillis);
+        JwtBuilder builder = Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .claim("token_type", "refresh")
+                .setExpiration(exp);
+
+        if (rsaPrivateKey != null) {
+            return builder.signWith(rsaPrivateKey, SignatureAlgorithm.RS256).compact();
+        }
+        if (hmacKey != null) {
+            return builder.signWith(hmacKey, SignatureAlgorithm.HS256).compact();
+        }
+        throw new IllegalStateException("No signing key configured for JWT. Provide rsa private key or jwt.secret.");
+    }
+
+    public long getRefreshValidityMillis() {
+        return this.refreshValidityMillis;
     }
 
     public String extractUsername(String token) {
@@ -86,8 +112,20 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token) {
+        return validateToken(token, null);
+    }
+
+    public boolean validateToken(String token, String expectedTokenType) {
         try {
-            Jwts.parserBuilder().setSigningKey(resolveVerificationKey()).build().parseClaimsJws(token);
+            Claims claims = Jwts.parserBuilder().setSigningKey(resolveVerificationKey()).build().parseClaimsJws(token)
+                    .getBody();
+            if (expectedTokenType != null) {
+                Object t = claims.get("token_type");
+                if (t == null)
+                    return false;
+                if (!expectedTokenType.equals(t.toString()))
+                    return false;
+            }
             return true;
         } catch (JwtException e) {
             return false;

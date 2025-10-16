@@ -21,6 +21,7 @@ spring:
 jwt:
   secret: change-me-please-change-this-to-a-very-long-secret-for-prod-0123456789
   expiration-ms: 3600000
+  refresh-expiration-ms: 1209600000
 
 ---
 # Postgres profile
@@ -47,3 +48,4 @@ spring:
 jwt:
   secret: change-me-please-change-this-to-a-very-long-secret-for-prod-0123456789
   expiration-ms: 3600000
+  refresh-expiration-ms: 1209600000
