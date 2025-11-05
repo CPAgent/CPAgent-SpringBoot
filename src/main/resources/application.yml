@@ -31,6 +31,7 @@ spring:
       on-profile: postgres
   datasource:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:cpagent_db}
+    # url: jdbc:postgresql://auth-db:${POSTGRES_PORT:5432}/${POSTGRES_DB:cpagent_db}
     driverClassName: org.postgresql.Driver
     username: ${POSTGRES_USER:cpagent}
     password: ${POSTGRES_PASSWORD:cpagent_pass}

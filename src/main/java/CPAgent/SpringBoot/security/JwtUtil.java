@@ -98,7 +98,7 @@ public class JwtUtil {
         return this.refreshValidityMillis;
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(resolveVerificationKey())

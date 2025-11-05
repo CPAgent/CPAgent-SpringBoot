@@ -17,11 +17,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User register(String email, String username, String rawPassword) {
+    public User register(String email, String rawPassword) {
         String hashed = passwordEncoder.encode(rawPassword);
         User user = new User();
         user.setEmail(email);
-        user.setUsername(username);
         user.setPassword(hashed);
         return userRepository.save(user);
     }

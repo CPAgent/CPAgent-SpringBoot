@@ -1,15 +1,32 @@
 services:
-  db:
+  # auth-server:
+  #   image: openjdk:17-ea-33-jdk-slim
+  #   container_name: cpagent-auth-server
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./:/app
+  #   working_dir: /app
+  #   command: sh -c "./gradlew bootRun --args='--spring.profiles.active=postgres'"
+  #   ports: 
+  #     - "8080:8080"
+  #   depends_on:
+  #     - auth-db
+  auth-db:
     image: postgres:18-alpine
-    container_name: cpagent_postgres
+    container_name: cpagent-auth-db
     restart: unless-stopped
     env_file:
       - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
+    # 만약 PgAdmin을 사용하고 싶다면 아래 주석을 해제하세요.
     ports:
       - "5432:5432"
 
 volumes:
   pgdata:
     name: cpagent_pgdata
+
+networks:
+  cpagent-auth-network:
+    driver: bridge

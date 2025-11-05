@@ -26,8 +26,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        User u = userService.register(req.getEmail(), req.getUsername(), req.getPassword());
-        return ResponseEntity.ok(Map.of("id", u.getId(), "username", u.getUsername()));
+        User u = userService.register(req.getEmail(), req.getPassword());
+        return ResponseEntity.ok(Map.of("id", u.getId()));
     }
 
     @PostMapping("/login")
@@ -58,7 +58,7 @@ public class AuthController {
                         refreshTokenService.deleteByToken(rt);
                         return ResponseEntity.status(401).body(Map.of("error", "invalid refresh token"));
                     }
-                    String email = jwtUtil.extractUsername(rt);
+                    String email = jwtUtil.extractEmail(rt);
                     String newAccess = jwtUtil.generateToken(email);
                     return ResponseEntity.ok(Map.of("access_token", newAccess));
                 })
@@ -83,7 +83,6 @@ public class AuthController {
     @Data
     public static class RegisterRequest {
         private String email;
-        private String username;
         private String password;
     }
 
